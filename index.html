@@ -1,0 +1,441 @@
+<!doctype html><html lang="nl"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Soorten om het huis</title>
+<meta name="description" content="Een veldnotitieboek voor planten, dieren en paddenstoelen in en om het huis.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@1,400;1,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: field notebook — one big capture button, then specimen cards; herbarium label in the detail view */
+:root{
+  --bg:#ECEFEA; --surface:#F8FAF6; --fg:#1C2822; --muted:#5D6B63; --line:#C9D2CA;
+  --accent:#2E6A4E; --accent-fg:#F4F8F4; --tint:#DCE6DE; --danger:#A3392B; --warn:#9A6A10;
+  --g-plant:#3F7A3A; --g-insect:#B07A16; --g-bird:#2F6496; --g-fungus:#8A5A3C; --g-mammal:#7B4F8E; --g-other:#5D6B63;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+  --latin:"IBM Plex Serif",Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#131A16; --surface:#1B241F; --fg:#E3EBE5; --muted:#93A399; --line:#2E3B34;
+  --accent:#7DBE98; --accent-fg:#0F1712; --tint:#24332B; --danger:#E0806F; --warn:#E1B04E;
+  --g-plant:#86C47F; --g-insect:#E1B04E; --g-bird:#7FB0E0; --g-fungus:#CC9A78; --g-mammal:#BC94CF; --g-other:#93A399;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#131A16; --surface:#1B241F; --fg:#E3EBE5; --muted:#93A399; --line:#2E3B34;
+  --accent:#7DBE98; --accent-fg:#0F1712; --tint:#24332B; --danger:#E0806F; --warn:#E1B04E;
+  --g-plant:#86C47F; --g-insect:#E1B04E; --g-bird:#7FB0E0; --g-fungus:#CC9A78; --g-mammal:#BC94CF; --g-other:#93A399;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:16px;padding-block:18px 60px}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 24px}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(26px,6vw,40px);line-height:1.02;letter-spacing:-.02em;margin:0;text-wrap:balance}
+.tally{display:flex;gap:20px;font-family:var(--mono);font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.tally b{display:block;font-family:var(--display);font-size:24px;color:var(--fg);letter-spacing:-.01em;font-variant-numeric:tabular-nums;text-transform:none}
+
+.capture{margin-block:18px 6px;position:relative;display:flex;align-items:center;justify-content:center;gap:12px;
+  background:var(--accent);color:var(--accent-fg);border-radius:14px;min-height:92px;padding:18px;cursor:pointer;
+  font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-.01em}
+.capture input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.capture svg{width:34px;height:34px;flex:none}
+.capture:focus-within{outline:3px solid var(--fg);outline-offset:3px}
+.hint{font-size:13px;color:var(--muted);text-align:center;margin:0 0 6px}
+
+.queue{display:grid;gap:8px;margin-block:12px}
+.qi{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px}
+.qi img{width:56px;height:56px;object-fit:cover;border-radius:6px;background:var(--tint)}
+.qi > div{min-width:0}
+.qi .st{font-size:13px;color:var(--muted)}
+.spin{width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--accent);border-radius:50%;display:inline-block;vertical-align:-3px;margin-right:6px}
+@media (prefers-reduced-motion:no-preference){.spin{animation:sp 0.9s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}}
+
+.bar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;padding-block:14px 12px;border-top:1px solid var(--line);margin-top:10px}
+.tabs{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface)}
+.tabs button{border:0;background:none;padding:6px 14px;border-radius:999px;cursor:pointer;font-weight:500;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--fg);color:var(--bg)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:none;border-radius:999px;padding:4px 10px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;color:var(--fg)}
+.chip[aria-pressed="true"]{border-color:var(--fg);background:var(--tint)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--c,var(--g-other));flex:none}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden;cursor:pointer;text-align:left;padding:0;display:flex;flex-direction:column}
+.card:hover{border-color:var(--muted)}
+.card .ph{aspect-ratio:4/3;background:var(--tint);width:100%;max-width:100%;object-fit:cover;display:block}
+.card .meta{padding:9px 11px 11px;display:grid;gap:1px;min-width:0}
+.nl{font-weight:600;font-size:15px;line-height:1.25;overflow-wrap:anywhere}
+.la{font-family:var(--latin);font-style:italic;color:var(--muted);font-size:14px;overflow-wrap:anywhere}
+.small{font-family:var(--mono);font-size:11.5px;color:var(--muted);letter-spacing:.02em;display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:4px}
+.todo{color:var(--warn);font-weight:500}
+
+.list{display:grid;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;padding:10px 4px;border:0;border-bottom:1px solid var(--line);cursor:pointer;background:none;text-align:left;width:100%}
+.row:hover{background:var(--tint)}
+.row img{width:64px;height:64px;object-fit:cover;border-radius:6px;background:var(--tint)}
+.row .when{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.row > div{min-width:0}
+.daycap{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:18px 4px 6px}
+
+.empty{border:1.5px dashed var(--line);border-radius:10px;padding:30px 20px;text-align:center;color:var(--muted);display:grid;gap:6px;justify-items:center}
+.empty h2{font-family:var(--display);font-size:21px;color:var(--fg);margin:0}
+
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 14px;cursor:pointer;font-weight:500}
+.btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.btn.danger{color:var(--danger);border-color:var(--danger);background:none}
+.btn.ghost{border-color:transparent;background:none;color:var(--accent);padding-inline:6px}
+.btn:disabled{opacity:.55;cursor:default}
+
+dialog{border:0;padding:0;background:var(--surface);color:var(--fg);border-radius:12px;width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 32px);overflow:auto}
+dialog::backdrop{background:rgb(10 16 12 / .55)}
+.dlg{padding:18px;display:grid;gap:14px}
+.dlg h2{font-family:var(--display);font-size:22px;margin:0;letter-spacing:-.01em;overflow-wrap:anywhere}
+.dhead{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.x{border:0;background:none;font-size:24px;cursor:pointer;color:var(--muted);line-height:1;padding:4px 8px}
+.full-ph{width:100%;max-width:100%;border-radius:8px;background:var(--tint);min-height:120px;display:block}
+.label{border:1px solid var(--fg);border-radius:2px;padding:12px 14px;font-family:var(--mono);font-size:12.5px;display:grid;gap:4px;background:var(--bg)}
+.label .lnl{font-family:var(--body);font-weight:600;font-size:17px}
+.label .lla{font-family:var(--latin);font-style:italic;font-size:16px}
+.label dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:6px 0 0}
+.label dt{color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.label dd{margin:0;overflow-wrap:anywhere}
+.label a{color:var(--accent)}
+.ai{background:var(--tint);border-radius:8px;padding:12px;display:grid;gap:4px;font-size:14px}
+.ai .alts{color:var(--muted);font-size:13px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.fields .full{grid-column:1/-1}
+label.f{display:grid;gap:4px;font-size:11.5px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);min-width:0}
+label.f input,label.f select,label.f textarea{font-family:var(--body);text-transform:none;letter-spacing:0;font-size:15px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px;width:100%;min-width:0}
+label.f input.latin{font-family:var(--latin);font-style:italic}
+.actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;align-items:center}
+.actions .grow{flex:1}
+.msg{font-size:13px;color:var(--danger)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:9px 14px;border-radius:8px;font-size:14px;max-width:calc(100vw - 32px)}
+.backlink{display:inline-block;margin-bottom:10px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+.backlink:hover{color:var(--accent)}
+.keybox{margin-block:10px;font-size:13px;color:var(--muted)}
+.keybox p{margin:0 0 8px}
+.krow{display:flex;gap:8px;flex-wrap:wrap}
+.krow input{flex:1;min-width:220px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+.foot{margin-top:40px;padding-top:14px;border-top:1px solid var(--line);display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted)}
+.notice{background:var(--tint);border-radius:8px;padding:10px 12px;font-size:14px;margin-top:12px}
+@media (max-width:480px){.fields{grid-template-columns:1fr}.row{grid-template-columns:56px 1fr}.row .when{grid-column:2;text-align:left}.row img{width:56px;height:56px}.capture{font-size:20px;min-height:84px}}
+@media (prefers-reduced-motion:no-preference){.card,.row{transition:background .15s,border-color .15s}}
+</style>
+
+<div class="wrap">
+  <a class="backlink" href="../">← alle tools</a>
+  <header class="top">
+    <h1>Soorten om het huis</h1>
+    <div class="tally"><span><b id="nSpecies">0</b>soorten</span><span><b id="nObs">0</b>waarnemingen</span></div>
+  </header>
+
+  <label class="capture" id="capture">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>
+    Foto toevoegen
+    <input type="file" id="file" accept="image/*" multiple aria-label="Foto maken of kiezen">
+  </label>
+  <p class="hint" id="hint">Maak een foto of kies er een paar. Claude determineert en zet ze in de catalogus.</p>
+
+  <section class="keybox" id="keybox">
+    <p id="keyHelp"></p>
+    <div class="krow">
+      <input type="password" id="apikey" autocomplete="off" spellcheck="false" placeholder="sk-ant-… (optioneel, voor automatisch determineren)" aria-label="Anthropic API-sleutel">
+      <button class="btn" id="keySave">Bewaar sleutel</button>
+      <button class="btn ghost" id="keyClear" hidden>Wis sleutel</button>
+    </div>
+  </section>
+
+  <div class="queue" id="queue"></div>
+  <div id="notice" class="notice" hidden></div>
+
+  <div class="bar">
+    <div class="tabs" role="tablist">
+      <button role="tab" id="tabSp" aria-selected="true">Soorten</button>
+      <button role="tab" id="tabObs" aria-selected="false">Tijdlijn</button>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+  <main id="view"></main>
+  <div class="foot"><span>Je waarnemingen staan alleen in deze browser.</span><button class="btn" id="exp">Back-up downloaden</button><button class="btn" id="imp">Back-up terugzetten</button><input type="file" id="impFile" accept="application/json" hidden></div>
+</div>
+
+<dialog id="detDlg"><div class="dlg" id="det"></div></dialog>
+
+<script>
+const GROUPS=[
+  ["plant","Planten","--g-plant"],["insect","Insecten & spinnen","--g-insect"],["vogel","Vogels","--g-bird"],
+  ["paddenstoel","Paddenstoelen","--g-fungus"],["zoogdier","Zoogdieren","--g-mammal"],["overig","Overig","--g-other"]];
+const G=Object.fromEntries(GROUPS.map(g=>[g[0],{label:g[1],c:`var(${g[2]})`}]));
+const grp=k=>G[k]||G.overig;
+const $=id=>document.getElementById(id);
+function h(tag,attrs={},...kids){const e=document.createElement(tag);for(const[k,v]of Object.entries(attrs)){if(v==null||v===false)continue;if(k==="class")e.className=v;else if(k==="style")e.style.cssText=v;else if(k.startsWith("on"))e.addEventListener(k.slice(2),v);else e.setAttribute(k,v===true?"":v)}for(const k of kids.flat()){if(k==null||k===false)continue;e.append(k.nodeType?k:document.createTextNode(String(k)))}return e}
+
+let db=null,sample=null,canAI=false;
+let obs=[],tab="sp",filter=null,spFocus=null,loaded=false;
+const queue=[];
+try{const t=localStorage.getItem("tab");if(t==="sp"||t==="obs")tab=t}catch(e){}
+
+const fmtDay=d=>d.toLocaleDateString("nl-NL",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+const fmtShort=d=>d.toLocaleDateString("nl-NL",{day:"numeric",month:"short",year:"2-digit"});
+const fmtTime=d=>d.toLocaleTimeString("nl-NL",{hour:"2-digit",minute:"2-digit"});
+const keyOf=o=>(o.latin||o.nl||"?").trim().toLowerCase();
+const isTodo=o=>!o.nl||o.nl==="Nog te bepalen";
+const placeTxt=o=>o.place||(o.lat!=null?`${o.lat.toFixed(4)}, ${o.lon.toFixed(4)}`:"");
+
+/* ---------- render ---------- */
+function species(){
+  const m=new Map();
+  for(const o of obs){if(isTodo(o))continue;const k=keyOf(o);if(!m.has(k))m.set(k,{key:k,items:[]});m.get(k).items.push(o)}
+  return[...m.values()].map(s=>{s.items.sort((a,b)=>b.takenAt.localeCompare(a.takenAt));const l=s.items[0];
+    s.nl=(s.items.find(i=>i.nl)||l).nl;s.latin=(s.items.find(i=>i.latin)||l).latin;s.group=l.group||"overig";
+    s.first=s.items[s.items.length-1].takenAt;s.last=l.takenAt;s.thumb=l.thumb;return s})
+   .sort((a,b)=>b.last.localeCompare(a.last));
+}
+function renderChips(){
+  const present=new Set(obs.map(o=>o.group||"overig"));
+  $("chips").replaceChildren(
+    h("button",{class:"chip","aria-pressed":String(!filter),onclick:()=>{filter=null;render()}},"Alles"),
+    ...GROUPS.filter(g=>present.has(g[0])).map(([k,l])=>h("button",{class:"chip","aria-pressed":String(filter===k),onclick:()=>{filter=filter===k?null:k;render()}},h("span",{class:"dot",style:`--c:${G[k].c}`}),l)));
+}
+function render(){
+  const sp=species();
+  $("nSpecies").textContent=sp.length;$("nObs").textContent=obs.length;
+  $("tabSp").setAttribute("aria-selected",String(tab==="sp"));$("tabObs").setAttribute("aria-selected",String(tab==="obs"));
+  renderChips();
+  const v=$("view");
+  if(!obs.length){v.replaceChildren(h("div",{class:"empty"},
+    h("h2",{},loaded?"Nog geen soorten":"Catalogus laden…"),
+    h("p",{style:"margin:0;max-width:44ch"},"Fotografeer iets dat in of om het huis leeft: een plant in de voortuin, een spin in de badkamer, een merel op de schutting. Tik op ‘Foto toevoegen’ en de rest gaat vanzelf.")));return}
+  const todo=obs.filter(isTodo);
+  if(tab==="sp"){
+    if(spFocus){const s=sp.find(x=>x.key===spFocus);if(s){v.replaceChildren(
+      h("button",{class:"btn",onclick:()=>{spFocus=null;render()}},"← Alle soorten"),
+      h("div",{style:"padding:14px 0 4px"},h("div",{class:"nl",style:"font-size:22px;font-family:var(--display)"},s.nl),s.latin?h("div",{class:"la",style:"font-size:16px"},s.latin):null,
+        h("div",{class:"small"},h("span",{class:"dot",style:`--c:${grp(s.group).c}`}),grp(s.group).label," · ",s.items.length,"× gezien")),
+      obsList(s.items));return}spFocus=null}
+    const list=sp.filter(s=>!filter||s.group===filter);
+    v.replaceChildren(
+      todo.length&&!filter?h("div",{style:"margin-bottom:14px"},h("div",{class:"daycap",style:"padding-top:0"},"Nog te bepalen"),obsList(todo,true)):"",
+      list.length?h("div",{class:"grid"},list.map(s=>h("button",{class:"card",onclick:()=>{spFocus=s.key;render();window.scrollTo(0,0)}},
+        h("img",{class:"ph",src:s.thumb,alt:s.nl,loading:"lazy"}),
+        h("div",{class:"meta"},h("div",{class:"nl"},s.nl),s.latin?h("div",{class:"la"},s.latin):null,
+          h("div",{class:"small"},h("span",{class:"dot",style:`--c:${grp(s.group).c}`}),s.items.length+"×"," · ",
+            s.items.length>1?fmtShort(new Date(s.first))+" – "+fmtShort(new Date(s.last)):fmtShort(new Date(s.last))))))):"");
+  }else v.replaceChildren(obsList(obs.filter(o=>!filter||(o.group||"overig")===filter)));
+}
+function obsList(items,flat){
+  const out=[];let day="";
+  for(const o of[...items].sort((a,b)=>b.takenAt.localeCompare(a.takenAt))){
+    const d=new Date(o.takenAt);const dk=d.toDateString();
+    if(!flat&&dk!==day){day=dk;out.push(h("div",{class:"daycap"},fmtDay(d)))}
+    const todo=isTodo(o);
+    out.push(h("button",{class:"row",onclick:()=>openDetail(o.id)},
+      h("img",{src:o.thumb,alt:"",loading:"lazy"}),
+      h("div",{},h("div",{class:"nl"+(todo?" todo":"")},o.nl||"Nog te bepalen"),o.latin?h("div",{class:"la"},o.latin):null,
+        h("div",{class:"small"},h("span",{class:"dot",style:`--c:${grp(o.group).c}`}),placeTxt(o)||"geen locatie",o.confidence?" · "+o.confidence:"")),
+      h("div",{class:"when"},flat?fmtShort(d):fmtTime(d))));
+  }
+  return h("div",{class:"list"},out);
+}
+
+/* ---------- queue (upload in progress) ---------- */
+function renderQueue(){
+  $("queue").replaceChildren(...queue.map(q=>h("div",{class:"qi"},
+    h("img",{src:q.thumb||"",alt:""}),
+    h("div",{},h("div",{class:"nl"},q.title),h("div",{class:"st"},q.busy?h("span",{class:"spin","aria-hidden":"true"}):"",q.status)),
+    q.doneId?h("button",{class:"btn ghost",onclick:()=>openDetail(q.doneId)},"Bekijk"):"")));
+}
+
+/* ---------- image + EXIF ---------- */
+function exif(buf){const out={};try{const v=new DataView(buf);if(v.getUint16(0)!==0xFFD8)return out;let p=2;
+  while(p<v.byteLength-4){const m=v.getUint16(p);const len=v.getUint16(p+2);
+    if(m===0xFFE1&&v.getUint32(p+4)===0x45786966){const t=p+10;const le=v.getUint16(t)===0x4949;
+      const u16=o=>v.getUint16(t+o,le),u32=o=>v.getUint32(t+o,le);
+      const find=(ifd,tag)=>{const n=u16(ifd);for(let i=0;i<n;i++){const e=ifd+2+i*12;if(u16(e)===tag)return e}return null};
+      const str=(e,n)=>{const c=u32(e+4);const off=c<=4?e+8:u32(e+8);let s="";for(let i=0;i<Math.min(n,c);i++){const ch=v.getUint8(t+off+i);if(!ch)break;s+=String.fromCharCode(ch)}return s};
+      const rat3=e=>{const off=u32(e+8);const r=i=>u32(off+i*8)/(u32(off+i*8+4)||1);return r(0)+r(1)/60+r(2)/3600};
+      const ifd0=u32(4);let s=null;const ep=find(ifd0,0x8769);
+      if(ep){const d=find(u32(ep+8),0x9003);if(d)s=str(d,19)}
+      if(!s){const d=find(ifd0,0x0132);if(d)s=str(d,19)}
+      if(s){const a=s.match(/(\d{4}):(\d{2}):(\d{2}) (\d{2}):(\d{2})/);if(a)out.date=new Date(+a[1],a[2]-1,+a[3],+a[4],+a[5])}
+      const gp=find(ifd0,0x8825);
+      if(gp){const g=u32(gp+8);const lr=find(g,1),la=find(g,2),or=find(g,3),lo=find(g,4);
+        if(la&&lo){let lat=rat3(la),lon=rat3(lo);if(lr&&str(lr,1)==="S")lat=-lat;if(or&&str(or,1)==="W")lon=-lon;
+          if(isFinite(lat)&&isFinite(lon)&&(lat||lon)){out.lat=+lat.toFixed(6);out.lon=+lon.toFixed(6)}}}
+      return out}
+    if((m&0xFF00)!==0xFF00)break;p+=2+len}}catch(e){}return out}
+async function loadImage(file){
+  try{return await createImageBitmap(file,{imageOrientation:"from-image"})}catch(e){}
+  return await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error("Deze foto kan de browser niet openen."));i.src=URL.createObjectURL(file)});
+}
+function draw(img,max){const w=img.width,hh=img.height,s=Math.min(1,max/Math.max(w,hh));const c=document.createElement("canvas");c.width=Math.round(w*s);c.height=Math.round(hh*s);c.getContext("2d").drawImage(img,0,0,c.width,c.height);return c}
+function fit(img,max,limit){let m=max,q=.82,url;for(let i=0;i<8;i++){url=draw(img,m).toDataURL("image/jpeg",q);if(url.length<=limit)return url;if(q>.6)q-=.08;else m=Math.round(m*.82)}return url}
+const newId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+
+async function identify(blob,when,lat,lon){
+  const ctx=`Gefotografeerd op ${fmtDay(when)}`+(lat!=null?`, op coördinaten ${lat}, ${lon}`:", in of rond een huis in Nederland")+".";
+  return await sample.json(
+    "Je bent een ervaren veldbioloog in Nederland. Determineer het organisme op de foto. "+ctx+
+    " Houd rekening met seizoen en regio. Geef zo specifiek als verantwoord (soort, anders geslacht of familie). Antwoord alleen als JSON: "+
+    '{"nl":"Nederlandse naam","latin":"wetenschappelijke naam","group":"plant|insect|vogel|paddenstoel|zoogdier|overig","confidence":"hoog|middel|laag","kenmerken":"één zin met de doorslaggevende kenmerken","alternatieven":["Nederlandse naam (Latijn)"]}. '+
+    "Groep insect geldt ook voor spinnen, pissebedden en andere ongewervelden; amfibieën en reptielen vallen onder overig. Maximaal 3 alternatieven, leeg als je zeker bent. Staat er geen organisme op, gebruik dan nl \"Nog te bepalen\".",
+    {images:[blob],modelTier:"default"});
+}
+
+async function handleFile(file){
+  const q={title:file.name||"Foto",status:"Foto verwerken…",busy:true};queue.unshift(q);renderQueue();
+  try{
+    const meta=exif(await file.slice(0,256*1024).arrayBuffer());
+    const when=meta.date||new Date(file.lastModified||Date.now());
+    const img=await loadImage(file);
+    const full=fit(img,1400,240000),thumb=fit(img,420,40000);
+    q.thumb=thumb;q.status=canAI?"Claude determineert…":"Opslaan…";renderQueue();
+    const id=newId();
+    const doc={nl:"Nog te bepalen",latin:"",group:"overig",place:"",takenAt:when.toISOString(),note:"",thumb,photoId:id,addedAt:new Date().toISOString()};
+    if(meta.lat!=null){doc.lat=meta.lat;doc.lon=meta.lon}
+    await db.doc("photos/"+id).set({src:full});
+    if(canAI){
+      try{const blob=await new Promise(r=>draw(img,1400).toBlob(r,"image/jpeg",.85));
+        const r=await identify(blob,when,meta.lat,meta.lon);
+        if(r&&r.nl){doc.nl=r.nl;doc.latin=r.latin||"";doc.group=G[r.group]?r.group:"overig";doc.confidence=r.confidence||"";doc.kenmerken=r.kenmerken||"";doc.alts=Array.isArray(r.alternatieven)?r.alternatieven.slice(0,3):[];doc.idBy="Claude"}
+      }catch(err){q.aiErr=err&&err.code==="auth"?"Je API-sleutel werd geweigerd; controleer hem bovenaan.":err&&err.code==="rate_limited"?"Even te veel verzoeken; later opnieuw determineren.":"Determineren lukte niet; je kunt het later opnieuw proberen."}
+    }
+    await db.doc("obs/"+id).set(doc);
+    q.busy=false;q.doneId=id;q.title=doc.nl+(doc.latin?" · "+doc.latin:"");
+    q.status=(q.aiErr||(doc.confidence?"Zekerheid "+doc.confidence:"Opgeslagen"))+(meta.lat==null?" · geen GPS in foto":"");
+    renderQueue();
+    setTimeout(()=>{const i=queue.indexOf(q);if(i>-1&&!q.busy){queue.splice(i,1);renderQueue()}},12000);
+  }catch(err){q.busy=false;q.status=err&&err.message?err.message:"Opslaan lukte niet. Probeer het opnieuw.";renderQueue()}
+}
+
+$("file").addEventListener("change",async e=>{
+  const files=[...e.target.files];e.target.value="";if(!files.length)return;
+  if(!db){toast("De catalogus is nog niet geladen.");return}
+  for(const f of files)await handleFile(f);
+});
+
+/* ---------- detail + edit ---------- */
+async function openDetail(id){
+  const o=obs.find(x=>x.id===id);if(!o)return;
+  const d=$("det");const img=h("img",{class:"full-ph",src:o.thumb,alt:o.nl});
+  const t=new Date(o.takenAt);const g=grp(o.group);
+  const mapLink=o.lat!=null?h("a",{href:`https://www.openstreetmap.org/?mlat=${o.lat}&mlon=${o.lon}#map=17/${o.lat}/${o.lon}`,target:"_blank",rel:"noopener"},"kaart"):null;
+  const view=()=>d.replaceChildren(
+    h("div",{class:"dhead"},h("h2",{},o.nl||"Nog te bepalen"),h("button",{class:"x","aria-label":"Sluiten",onclick:()=>$("detDlg").close()},"×")),
+    img,
+    h("div",{class:"label"},
+      h("div",{class:"lnl"},o.nl||"Nog te bepalen"),o.latin?h("div",{class:"lla"},o.latin):null,
+      h("dl",{},h("dt",{},"Groep"),h("dd",{},g.label),h("dt",{},"Datum"),h("dd",{},fmtDay(t)+", "+fmtTime(t)),
+        h("dt",{},"Plek"),h("dd",{},o.place||"—"),
+        o.lat!=null?[h("dt",{},"GPS"),h("dd",{},`${o.lat.toFixed(5)}, ${o.lon.toFixed(5)} · `,mapLink)]:null,
+        o.idBy?[h("dt",{},"Det."),h("dd",{},o.idBy+(o.confidence?" ("+o.confidence+")":""))]:null)),
+    (o.kenmerken||(o.alts&&o.alts.length))?h("div",{class:"ai"},o.kenmerken?h("div",{},o.kenmerken):null,o.alts&&o.alts.length?h("div",{class:"alts"},"Ook mogelijk: "+o.alts.join(", ")):null):null,
+    o.note?h("div",{style:"white-space:pre-wrap;font-size:14px"},o.note):null,
+    h("div",{class:"actions"},
+      canAI?h("button",{class:"btn",onclick:e=>redo(e.target)},"Opnieuw determineren"):null,
+      h("span",{class:"grow"}),
+      h("button",{class:"btn primary",onclick:edit},"Aanpassen")));
+  async function getBlob(){return await new Promise(r=>{const c=document.createElement("canvas");const i=new Image();i.onload=()=>{c.width=i.naturalWidth;c.height=i.naturalHeight;c.getContext("2d").drawImage(i,0,0);c.toBlob(r,"image/jpeg",.85)};i.onerror=()=>r(null);i.src=img.src})}
+  async function redo(b){b.disabled=true;b.textContent="Claude kijkt…";
+    try{const blob=await getBlob();const r=await identify(blob,t,o.lat,o.lon);
+      if(r&&r.nl){await db.doc("obs/"+o.id).update({nl:r.nl,latin:r.latin||"",group:G[r.group]?r.group:"overig",confidence:r.confidence||"",kenmerken:r.kenmerken||"",alts:Array.isArray(r.alternatieven)?r.alternatieven.slice(0,3):[],idBy:"Claude"});
+        Object.assign(o,{nl:r.nl,latin:r.latin||"",group:G[r.group]?r.group:"overig",confidence:r.confidence||"",kenmerken:r.kenmerken||"",alts:r.alternatieven||[],idBy:"Claude"});view();toast("Bijgewerkt: "+r.nl)}}
+    catch(err){b.textContent=err&&err.code==="auth"?"Sleutel geweigerd":err&&err.code==="rate_limited"?"Te veel verzoeken, wacht even":"Lukte niet, probeer opnieuw";b.disabled=false}}
+  function edit(){
+    const f={nl:h("input",{id:"eNl",value:isTodo(o)?"":o.nl,placeholder:"bv. Gewone pad"}),la:h("input",{id:"eLa",class:"latin",value:o.latin||"",placeholder:"Bufo bufo"}),
+      gr:h("select",{id:"eGr"},GROUPS.map(([k,l])=>h("option",{value:k,selected:k===(o.group||"overig")},l))),
+      pl:h("input",{id:"ePl",value:o.place||"",placeholder:"Tuin, balkon, voordeur…",list:"places"}),
+      wh:h("input",{id:"eWh",type:"datetime-local",value:toLocalInput(t)}),no:h("textarea",{id:"eNo",rows:"2",placeholder:"Gedrag, aantal, bijzonderheden"},o.note||"")};
+    const msg=h("div",{class:"msg"});const del=h("span",{class:"grow"});
+    const askDel=()=>del.replaceChildren(h("span",{style:"font-size:14px;margin-right:6px"},"Echt verwijderen?"),
+      h("button",{class:"btn",onclick:()=>del.replaceChildren(delBtn())},"Nee"),
+      h("button",{class:"btn danger",onclick:async e=>{e.target.disabled=true;try{await db.doc("photos/"+o.photoId).delete().catch(()=>{});await db.doc("obs/"+o.id).delete();$("detDlg").close();toast("Verwijderd")}catch(err){msg.textContent="Verwijderen lukte niet. Probeer het opnieuw."}}},"Verwijderen"));
+    const delBtn=()=>h("button",{class:"btn danger",onclick:askDel},"Verwijderen");del.append(delBtn());
+    d.replaceChildren(h("div",{class:"dhead"},h("h2",{},"Aanpassen"),h("button",{class:"x","aria-label":"Sluiten",onclick:()=>$("detDlg").close()},"×")),
+      h("div",{class:"fields"},
+        h("label",{class:"f"},"Nederlandse naam",f.nl),h("label",{class:"f"},"Wetenschappelijke naam",f.la),
+        h("label",{class:"f"},"Groep",f.gr),h("label",{class:"f"},"Plek",f.pl),
+        h("label",{class:"f"},"Moment",f.wh),h("label",{class:"f full"},"Notitie",f.no)),
+      h("datalist",{id:"places"},["Tuin","Voortuin","Achtertuin","Huis","Balkon","Voordeur","Schuur","Straat"].map(p=>h("option",{value:p}))),
+      msg,
+      h("div",{class:"actions"},del,h("button",{class:"btn",onclick:view},"Annuleren"),
+        h("button",{class:"btn primary",onclick:async e=>{const nl=f.nl.value.trim()||"Nog te bepalen";const la=f.la.value.trim();
+          const upd={nl,latin:la,group:f.gr.value,place:f.pl.value.trim(),note:f.no.value.trim()};
+          const wd=new Date(f.wh.value);if(!isNaN(wd))upd.takenAt=wd.toISOString();
+          if(nl!==o.nl||la!==(o.latin||"")){upd.idBy=nl==="Nog te bepalen"?"":"zelf";upd.confidence="";upd.kenmerken="";upd.alts=[]}
+          e.target.disabled=true;try{await db.doc("obs/"+o.id).update(upd);Object.assign(o,upd);view();toast("Opgeslagen")}catch(err){msg.textContent="Opslaan lukte niet. Probeer het opnieuw.";e.target.disabled=false}}},"Opslaan")));
+  }
+  view();$("detDlg").showModal();
+  if(db&&o.photoId){try{const s=await db.doc("photos/"+o.photoId).get();const data=s.exists&&s.data();if(data&&data.src)img.src=data.src}catch(e){}}
+}
+const toLocalInput=d=>{const p=n=>String(n).padStart(2,"0");return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`};
+function toast(t){const e=h("div",{class:"toast",role:"status"},t);document.body.append(e);setTimeout(()=>e.remove(),2600)}
+
+/* ---------- wiring ---------- */
+$("tabSp").onclick=()=>{tab="sp";spFocus=null;try{localStorage.setItem("tab",tab)}catch(e){}render()};
+$("tabObs").onclick=()=>{tab="obs";try{localStorage.setItem("tab",tab)}catch(e){}render()};
+render();
+
+
+/* ---------- standalone runtime: IndexedDB + Anthropic API (eigen sleutel) ---------- */
+const MODEL="claude-sonnet-5-5", APIKEY="soorten:apikey";
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+function makeDb(){
+  const open=new Promise((res,rej)=>{const r=indexedDB.open("soorten",1);r.onupgradeneeded=()=>r.result.createObjectStore("docs");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+  const tx=async(mode,fn)=>{const d=await open;return await new Promise((res,rej)=>{const t=d.transaction("docs",mode);const s=t.objectStore("docs");const r=fn(s);t.oncomplete=()=>res(r&&r.result);t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error)})};
+  const listeners=new Set();
+  const all=async()=>{const d=await open;return await new Promise((res,rej)=>{const out=[];const c=d.transaction("docs").objectStore("docs").openCursor();c.onsuccess=()=>{const cur=c.result;if(cur){out.push([cur.key,cur.value]);cur.continue()}else res(out)};c.onerror=()=>rej(c.error)})};
+  const notify=async()=>{if(!listeners.size)return;const rows=(await all()).filter(([k])=>k.startsWith("obs/")).map(([k,v])=>({id:k.slice(4),data:()=>v}));rows.sort((a,b)=>String(b.data().takenAt).localeCompare(String(a.data().takenAt)));for(const f of listeners)f({docs:rows})};
+  return{
+    doc(path){return{
+      async get(){const v=await tx("readonly",s=>s.get(path));return{exists:v!==undefined,data:()=>v}},
+      async set(data){await tx("readwrite",s=>s.put(data,path));notify()},
+      async update(patch){const cur=await tx("readonly",s=>s.get(path))||{};await tx("readwrite",s=>s.put({...cur,...patch},path));notify()},
+      async delete(){await tx("readwrite",s=>s.delete(path));notify()}}},
+    collection(){const q={orderBy:()=>q,limit:()=>q,onSnapshot(cb){listeners.add(cb);notify();return()=>listeners.delete(cb)}};return q},
+    async exportAll(){return Object.fromEntries(await all())},
+    async importAll(obj){const d=await open;await new Promise((res,rej)=>{const t=d.transaction("docs","readwrite");const s=t.objectStore("docs");for(const[k,v]of Object.entries(obj))s.put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error)});notify()}
+  };
+}
+const b64=blob=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]);r.onerror=()=>rej(r.error);r.readAsDataURL(blob)});
+function makeSample(){return{
+  async json(prompt,opts){
+    const key=store.get(APIKEY);if(!key){const e=new Error("geen sleutel");e.code="auth";throw e}
+    const content=[];for(const im of(opts&&opts.images)||[])content.push({type:"image",source:{type:"base64",media_type:"image/jpeg",data:await b64(im)}});
+    content.push({type:"text",text:prompt});
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"content-type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:MODEL,max_tokens:600,messages:[{role:"user",content}]})});
+    if(res.status===401||res.status===403){const e=new Error("auth");e.code="auth";throw e}
+    if(res.status===429){const e=new Error("rate");e.code="rate_limited";throw e}
+    if(!res.ok)throw new Error("HTTP "+res.status);
+    const data=await res.json();const txt=(data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n").replace(/```json|```/g,"").trim();
+    const m=txt.match(/\{[\s\S]*\}/);return JSON.parse(m?m[0]:txt)}
+};}
+function showKey(){
+  const has=!!store.get(APIKEY);canAI=has;
+  $("apikey").hidden=has;$("keySave").hidden=has;$("keyClear").hidden=!has;
+  $("keyHelp").textContent=has?"Automatisch determineren staat aan. Je sleutel blijft in deze browser en gaat alleen naar api.anthropic.com.":"Zonder sleutel kun je foto’s wel opslaan en zelf een naam geven. Met een eigen Anthropic API-sleutel determineert Claude ze voor je. De sleutel blijft in deze browser en gaat alleen naar api.anthropic.com.";
+  $("hint").textContent=has?"Maak een foto of kies er een paar. Claude determineert en zet ze in de catalogus.":"Maak een foto of kies er een paar. Ze komen in de catalogus; de naam vul je zelf in.";
+}
+$("keySave").onclick=()=>{const v=$("apikey").value.trim();if(!v)return;store.set(APIKEY,v);$("apikey").value="";showKey();toast("Sleutel bewaard")};
+$("apikey").addEventListener("keydown",e=>{if(e.key==="Enter")$("keySave").click()});
+$("keyClear").onclick=()=>{store.del(APIKEY);showKey()};
+$("exp").onclick=async()=>{if(!db)return;const blob=new Blob([JSON.stringify(await db.exportAll())],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="soorten-backup-"+new Date().toISOString().slice(0,10)+".json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)};
+$("imp").onclick=()=>$("impFile").click();
+$("impFile").addEventListener("change",async e=>{const f=e.target.files[0];e.target.value="";if(!f||!db)return;try{await db.importAll(JSON.parse(await f.text()));toast("Back-up teruggezet")}catch(err){toast("Dit bestand is geen geldige back-up")}});
+
+(async()=>{
+  const note=t=>{const n=$("notice");n.hidden=false;n.textContent=t};
+  if(!window.indexedDB){note("Deze browser kan geen gegevens bewaren; de catalogus werkt hier niet.");loaded=true;render();return}
+  db=makeDb();sample=makeSample();showKey();
+  db.collection("obs").orderBy("takenAt","desc").limit(1000).onSnapshot(snap=>{
+    obs=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>o.takenAt);loaded=true;render();
+  });
+  setTimeout(()=>{if(!loaded){loaded=true;render()}},1500);
+})();
+</script>
+
+</body></html>
